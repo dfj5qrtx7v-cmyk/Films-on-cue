@@ -1,0 +1,26 @@
+<%- include('../partials/head', { noindex: true }) %>
+<%- include('../partials/header') %>
+<main id="main">
+  <section class="message-page message-art">
+    <div class="wrap">
+      <div class="panel panel-paper message-panel">
+        <h1 class="display">Owner login</h1>
+        <% if (locals.notOwner) { %>
+          <p class="form-note form-note-error" role="alert">You signed in as <strong><%= notOwner.email || notOwner.name %></strong>, which isn’t the owner account for this site.</p>
+          <p class="small">If this is your account, add <code><%= notOwner.email %></code> as the <code>OWNER_EMAIL</code> secret in Replit, republish, then sign in again.</p>
+        <% } else if (!ownerReady && !devLogin) { %>
+          <p>Before you can sign in, add your Replit account’s email address as the <code>OWNER_EMAIL</code> secret in Replit, then republish.</p>
+        <% } else { %>
+          <p>Sign in to write and manage reviews.</p>
+        <% } %>
+        <% if (locals.error === 'failed') { %><p class="form-note form-note-error" role="alert">Sign-in didn’t complete. Try again.</p><% } %>
+        <% if (locals.error === 'setup' || (!authReady && !devLogin)) { %>
+          <p class="form-note form-note-error">Replit Auth isn’t available here. Run the site on Replit, or set <code>DEV_LOGIN=true</code> for local testing.</p>
+        <% } else { %>
+          <p><a class="btn btn-ink" href="/api/login"><%= devLogin ? 'Sign in (local test mode)' : 'Sign in with Replit' %></a></p>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

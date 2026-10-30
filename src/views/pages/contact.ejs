@@ -1,0 +1,69 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<%
+  const err = (k) => errors[k] ? `aria-invalid="true" aria-describedby="${k}-error"` : '';
+  const errText = (k) => errors[k] ? `<p class="form-note form-note-error" id="${k}-error">${escapeHtml(errors[k])}</p>` : '';
+%>
+<main id="main">
+  <section class="hero hero-band hero-contact">
+    <div class="wrap">
+      <div class="panel panel-ink band-title">
+        <h1 class="display"><%= settings.contact.heading %></h1>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap contact-grid">
+      <div class="contact-intro">
+        <p class="lede-dark"><%= settings.contact.intro %></p>
+        <% if (socials.length) { %>
+        <p class="muted">You can also find us on social media.</p>
+        <%- include('../partials/socials', { label: 'Social media' }) %>
+        <% } %>
+      </div>
+
+      <div class="contact-form-wrap" id="contact-form">
+        <% if (sent) { %>
+        <div class="form-done" role="status">
+          <h2>Message sent</h2>
+          <p>Thanks for getting in touch. We’ll reply to the email address you gave.</p>
+          <a class="text-link" href="/contact">Send another message</a>
+        </div>
+        <% } else { %>
+        <% if (Object.keys(errors).length) { %>
+        <div class="error-summary" role="alert" tabindex="-1">
+          <p><strong>Check the highlighted fields.</strong></p>
+        </div>
+        <% } %>
+        <form class="stack-form" method="post" action="/contact#contact-form" novalidate>
+          <%- include('../partials/spam-fields') %>
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" autocomplete="name" required value="<%= values.name || '' %>" <%- err('name') %>>
+            <%- errText('name') %>
+          </div>
+          <div class="field">
+            <label for="phone">Contact number <span class="optional">(optional)</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" value="<%= values.phone || '' %>" <%- err('phone') %>>
+            <%- errText('phone') %>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" spellcheck="false" required value="<%= values.email || '' %>" <%- err('email') %>>
+            <%- errText('email') %>
+          </div>
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="7" required <%- err('message') %>><%= values.message || '' %></textarea>
+            <%- errText('message') %>
+          </div>
+          <p class="small muted">We’ll only use these details to reply to you. See our <a href="/privacy">privacy policy</a>.</p>
+          <button class="btn btn-ink" type="submit">Send message</button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,5 @@
+<div class="hp" aria-hidden="true">
+  <label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+</div>
+<input type="hidden" name="stamp" value="<%= formStamp() %>">
+<% if (turnstileSiteKey) { %><div class="cf-turnstile" data-sitekey="<%= turnstileSiteKey %>" data-theme="light"></div><% } %>

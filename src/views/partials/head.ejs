@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<% const pageTitle = locals.title ? `${locals.title} | ${settings.site.name}` : `${settings.site.name}: reviews of the latest films`; %>
+<% const desc = locals.pageDescription || settings.site.description; %>
+<title><%= pageTitle %></title>
+<meta name="description" content="<%= desc %>">
+<link rel="canonical" href="<%= canonical %>">
+<meta property="og:site_name" content="<%= settings.site.name %>">
+<meta property="og:title" content="<%= locals.title || settings.site.name %>">
+<meta property="og:description" content="<%= desc %>">
+<meta property="og:type" content="<%= locals.ogType || 'website' %>">
+<meta property="og:url" content="<%= canonical %>">
+<meta property="og:image" content="<%= locals.ogImage || `${siteUrl}/img/share.png` %>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000000">
+<% if (locals.noindex) { %><meta name="robots" content="noindex"><% } %>
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="alternate" type="application/rss+xml" title="<%= settings.site.name %> reviews" href="/feed.xml">
+<link rel="preload" href="/fonts/gloock-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/schibsted-grotesk-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/site.css?v=<%= assetVersion %>">
+<% if (locals.editor) { %>
+<link rel="stylesheet" href="/vendor/trix/trix.css">
+<script src="/vendor/trix/trix.umd.min.js"></script>
+<% } %>
+<% if (locals.admin) { %><link rel="stylesheet" href="/css/admin.css?v=<%= assetVersion %>"><% } %>
+<script src="/js/site.js?v=<%= assetVersion %>" defer></script>
+<% if (locals.admin) { %><script src="/js/admin.js?v=<%= assetVersion %>"></script><% } %>
+<% if (!locals.admin && turnstileSiteKey) { %><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script><% } %>
+</head>

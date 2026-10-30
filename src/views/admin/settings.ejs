@@ -1,0 +1,108 @@
+<%- include('_top', { editor: true }) %>
+<%
+  const s = settings;
+  const err = (k) => errors[k] ? `aria-invalid="true" aria-describedby="${k}-error"` : '';
+  const errText = (k) => errors[k] ? `<p class="form-note form-note-error" id="${k}-error">${escapeHtml(errors[k])}</p>` : '';
+  const csrfField = `<input type="hidden" name="_csrf" value="${csrf}">`;
+%>
+<div class="admin-head"><h1>Site settings</h1></div>
+<nav class="tabs tabs-jump" aria-label="Settings sections">
+  <a href="#socials">Social links</a><a href="#home">Home page</a><a href="#about">About page</a><a href="#contact">Contact page</a><a href="#site">Site details</a><a href="#privacy">Privacy policy</a>
+</nav>
+
+<section class="admin-box settings-section" id="socials" aria-labelledby="socials-h">
+  <h2 id="socials-h">Social links</h2>
+  <p class="hint">Icons appear at the top and bottom of every page. Only links you fill in and tick are shown.</p>
+  <form method="post" action="/admin/settings/socials" class="stack-form" novalidate>
+    <%- csrfField %>
+    <label class="check"><input type="checkbox" name="show"<%- s.socials.show ? ' checked' : '' %>> <span>Show social icons on the site</span></label>
+    <div class="social-rows">
+      <% for (const [key, label] of Object.entries(SOCIAL_PLATFORMS)) { const item = s.socials.items[key] || {}; %>
+      <div class="social-row">
+        <span class="social-icon"><%- icon(key, { size: 22 }) %></span>
+        <div class="field">
+          <label for="<%= key %>_url"><%= label %> link</label>
+          <input id="<%= key %>_url" name="<%= key %>_url" type="url" value="<%= item.url || '' %>" placeholder="https://" <%- err(key + '_url') %>>
+          <%- errText(key + '_url') %>
+        </div>
+        <label class="check check-compact"><input type="checkbox" name="<%= key %>_visible"<%- item.visible ? ' checked' : '' %>> <span>Show</span></label>
+      </div>
+      <% } %>
+    </div>
+    <button class="btn btn-ink" type="submit">Save social links</button>
+  </form>
+</section>
+
+<section class="admin-box settings-section" id="home" aria-labelledby="home-h">
+  <h2 id="home-h">Home page</h2>
+  <form method="post" action="/admin/settings/home" class="stack-form" novalidate>
+    <%- csrfField %>
+    <div class="field"><label for="home-heading">Headline</label><input id="home-heading" name="heading" value="<%= s.home.heading %>" maxlength="160"></div>
+    <div class="field"><label for="home-intro">Introduction</label><textarea id="home-intro" name="intro" rows="3" maxlength="400"><%= s.home.intro %></textarea></div>
+    <div class="field"><label for="nl-heading-input">Newsletter heading</label><input id="nl-heading-input" name="newsletterHeading" value="<%= s.home.newsletterHeading %>" maxlength="80"></div>
+    <div class="field"><label for="nl-text">Newsletter text</label><textarea id="nl-text" name="newsletterText" rows="2" maxlength="240"><%= s.home.newsletterText %></textarea></div>
+    <button class="btn btn-ink" type="submit">Save home page</button>
+  </form>
+</section>
+
+<section class="admin-box settings-section" id="about" aria-labelledby="about-h">
+  <h2 id="about-h">About page</h2>
+  <form method="post" action="/admin/settings/about" class="stack-form" novalidate>
+    <%- csrfField %>
+    <div class="field"><label for="about-heading">Headline</label><input id="about-heading" name="heading" value="<%= s.about.heading %>" maxlength="160"></div>
+    <div class="field"><label for="about-intro">Introduction</label><textarea id="about-intro" name="intro" rows="3" maxlength="600"><%= s.about.intro %></textarea></div>
+    <div class="field">
+      <span class="field-label" id="about-body-label">Page text</span>
+      <input id="about-body" type="hidden" name="bodyHtml" value="<%= s.about.bodyHtml %>">
+      <trix-editor input="about-body" class="prose editor" aria-labelledby="about-body-label"></trix-editor>
+    </div>
+    <button class="btn btn-ink" type="submit">Save about page</button>
+  </form>
+</section>
+
+<section class="admin-box settings-section" id="contact" aria-labelledby="contact-h">
+  <h2 id="contact-h">Contact page</h2>
+  <form method="post" action="/admin/settings/contact" class="stack-form" novalidate>
+    <%- csrfField %>
+    <div class="field"><label for="contact-heading">Headline</label><input id="contact-heading" name="heading" value="<%= s.contact.heading %>" maxlength="120"></div>
+    <div class="field"><label for="contact-intro">Introduction</label><textarea id="contact-intro" name="intro" rows="3" maxlength="400"><%= s.contact.intro %></textarea></div>
+    <button class="btn btn-ink" type="submit">Save contact page</button>
+  </form>
+</section>
+
+<section class="admin-box settings-section" id="site" aria-labelledby="site-h">
+  <h2 id="site-h">Site details</h2>
+  <form method="post" action="/admin/settings/site" class="stack-form" novalidate>
+    <%- csrfField %>
+    <div class="field"><label for="site-name">Site name</label><input id="site-name" name="name" value="<%= s.site.name %>" maxlength="60"></div>
+    <div class="field">
+      <label for="site-desc">Description for search engines</label>
+      <p class="hint" id="site-desc-hint">Shown under your site in Google results and in the footer. Keep it under 160 characters.</p>
+      <textarea id="site-desc" name="description" rows="2" maxlength="200" aria-describedby="site-desc-hint" data-count="160"><%= s.site.description %></textarea>
+    </div>
+    <div class="field">
+      <label for="reviewer">Reviewer name</label>
+      <p class="hint" id="reviewer-hint">Shown as “By …” on each review. Leave blank to show no name.</p>
+      <input id="reviewer" name="reviewer" value="<%= s.site.reviewer %>" maxlength="80" aria-describedby="reviewer-hint">
+    </div>
+    <div class="field">
+      <label for="notifyEmail">Send contact messages to</label>
+      <p class="hint" id="notify-hint">Each new message is emailed here as well as saved in Messages.</p>
+      <input id="notifyEmail" name="notifyEmail" type="email" value="<%= s.site.notifyEmail %>" aria-describedby="notify-hint" <%- err('notifyEmail') %>>
+      <%- errText('notifyEmail') %>
+    </div>
+    <button class="btn btn-ink" type="submit">Save site details</button>
+  </form>
+</section>
+
+<section class="admin-box settings-section" id="privacy" aria-labelledby="privacy-h">
+  <h2 id="privacy-h">Privacy policy</h2>
+  <p class="hint">A starting policy is filled in for you. Check it describes how you actually use people’s details.</p>
+  <form method="post" action="/admin/settings/privacy" class="stack-form" novalidate>
+    <%- csrfField %>
+    <input id="privacy-body" type="hidden" name="bodyHtml" value="<%= s.privacy.bodyHtml %>">
+    <trix-editor input="privacy-body" class="prose editor" aria-label="Privacy policy text"></trix-editor>
+    <button class="btn btn-ink" type="submit">Save privacy policy</button>
+  </form>
+</section>
+<%- include('_bottom') %>

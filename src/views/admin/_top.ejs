@@ -1,0 +1,25 @@
+<%- include('../partials/head', { admin: true, noindex: true, editor: locals.editor }) %>
+<body class="admin">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="admin-shell">
+  <aside class="admin-side">
+    <a class="wordmark wordmark-light" href="/admin"><%= settings.site.name %><span class="cue-mark" aria-hidden="true"></span></a>
+    <nav class="admin-nav" aria-label="Dashboard">
+      <ul>
+        <% for (const [key, href, label] of [['overview', '/admin', 'Overview'], ['reviews', '/admin/reviews', 'Reviews'], ['newsletter', '/admin/newsletter', 'Newsletter'], ['messages', '/admin/messages', 'Messages'], ['settings', '/admin/settings', 'Site settings']]) { %>
+        <li><a href="<%= href %>"<%- section === key ? ' aria-current="page"' : '' %>><%= label %></a></li>
+        <% } %>
+      </ul>
+    </nav>
+    <div class="admin-side-foot">
+      <a class="admin-viewsite" href="/" target="_blank" rel="noopener">View site <%- icon('external', { size: 16 }) %></a>
+      <p class="admin-who">Signed in as <%= owner.name %></p>
+      <form method="post" action="/api/logout">
+        <button class="admin-signout" type="submit"><%- icon('logout', { size: 16 }) %> Sign out</button>
+      </form>
+    </div>
+  </aside>
+  <main class="admin-main" id="main">
+    <% if (locals.flash) { %>
+    <p class="flash flash-<%= flash.type %>" role="status"><%- icon(flash.type === 'error' ? 'close' : 'check', { size: 18 }) %> <%= flash.text %></p>
+    <% } %>

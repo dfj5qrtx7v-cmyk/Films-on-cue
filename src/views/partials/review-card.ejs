@@ -1,0 +1,11 @@
+<article class="card<%= locals.lead ? ' card-lead' : '' %>">
+  <div class="card-media">
+    <% if (r.promoted && locals.showFeatured) { %><p class="card-flag"><%- icon('pin', { size: 16 }) %> Featured</p><% } %>
+    <img src="<%= img(r.image_id, locals.lead ? '' : 'sm') %>" alt="<%= r.image_id ? (r.image_alt || '') : '' %>" width="<%= locals.lead ? 1800 : 760 %>" height="<%= locals.lead ? 1200 : 507 %>" loading="<%= locals.eager ? 'eager' : 'lazy' %>" decoding="async">
+  </div>
+  <div class="card-body">
+    <h3 class="card-title"><a href="/reviews/<%= r.slug %>"><%= r.title %></a></h3>
+    <p class="card-meta"><%- starsHtml(r.rating) %><% if (r.release_year) { %><span><%= r.release_year %></span><% } %></p>
+    <p class="card-excerpt"><%= r.excerpt %></p>
+  </div>
+</article>

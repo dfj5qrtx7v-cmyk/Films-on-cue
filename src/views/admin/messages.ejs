@@ -1,0 +1,34 @@
+<%- include('_top') %>
+<div class="admin-head"><h1>Messages</h1></div>
+<% if (rows.length) { %>
+<ul class="message-list">
+  <% for (const m of rows) { %>
+  <li class="message-item<%= m.is_read ? '' : ' is-unread' %>">
+    <div class="message-meta">
+      <h2><%= m.name %><% if (!m.is_read) { %> <span class="tag">New</span><% } %></h2>
+      <p class="muted small"><%= formatDateTime(m.created_at) %></p>
+    </div>
+    <p class="message-contact">
+      <a href="mailto:<%= m.email %>?subject=<%= encodeURIComponent('Re: your message to ' + settings.site.name) %>"><%= m.email %></a>
+      <% if (m.phone) { %><a href="tel:<%= m.phone.replace(/[^+\d]/g, '') %>"><%= m.phone %></a><% } %>
+    </p>
+    <p class="message-text"><%= m.message %></p>
+    <div class="button-row">
+      <a class="btn btn-ink btn-small" href="mailto:<%= m.email %>?subject=<%= encodeURIComponent('Re: your message to ' + settings.site.name) %>"><%- icon('mail', { size: 16 }) %> Reply</a>
+      <form method="post" action="/admin/messages/<%= m.id %>/read">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="read" value="<%= m.is_read ? 'no' : 'yes' %>">
+        <button class="btn btn-line btn-small" type="submit"><%= m.is_read ? 'Mark as unread' : 'Mark as read' %></button>
+      </form>
+      <form method="post" action="/admin/messages/<%= m.id %>/delete">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button class="link-button" type="submit" data-confirm="Delete this message from <%= m.name %>?">Delete</button>
+      </form>
+    </div>
+  </li>
+  <% } %>
+</ul>
+<% } else { %>
+<div class="admin-empty"><p>No messages yet. Messages sent from the contact page appear here<%= settings.site.notifyEmail ? `, and are also emailed to ${settings.site.notifyEmail}` : '' %>.</p></div>
+<% } %>
+<%- include('_bottom') %>

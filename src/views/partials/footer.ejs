@@ -1,0 +1,27 @@
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <a class="wordmark wordmark-light" href="/"><%= settings.site.name %><span class="cue-mark" aria-hidden="true"></span></a>
+      <p><%= settings.site.description %></p>
+    </div>
+    <nav aria-label="Footer">
+      <ul class="footer-links">
+        <li><a href="/reviews">Reviews</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/privacy">Privacy policy</a></li>
+        <li><a href="/feed.xml">RSS feed</a></li>
+      </ul>
+    </nav>
+    <% if (socials.length) { %>
+    <div class="footer-social">
+      <%- include('socials', { label: 'Social media' }) %>
+    </div>
+    <% } %>
+  </div>
+  <div class="wrap">
+    <div class="footer-base"><p>© <%= new Date().getFullYear() %> <%= settings.site.name %></p></div>
+  </div>
+</footer>
+</body>
+</html>

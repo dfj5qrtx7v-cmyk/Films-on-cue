@@ -1,0 +1,38 @@
+<table class="admin-table review-table">
+  <thead>
+    <tr><th scope="col">Review</th><th scope="col">Rating</th><th scope="col">Status</th><th scope="col">Promoted</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr>
+  </thead>
+  <tbody>
+  <% for (const r of rows) { %>
+    <tr>
+      <td>
+        <div class="cell-title">
+          <img src="<%= img(r.image_id, 'sm') %>" alt="" width="72" height="48" loading="lazy">
+          <a href="/admin/reviews/<%= r.id %>/edit"><%= r.title %></a>
+        </div>
+      </td>
+      <td data-label="Rating"><%- starsHtml(r.rating, { size: 14 }) %></td>
+      <td data-label="Status">
+        <% if (r.status === 'draft') { %><span class="tag tag-line">Draft</span>
+        <% } else if (r.scheduled) { %><span class="tag tag-line">Scheduled</span> <span class="muted small"><%= formatDateTime(r.published_at) %></span>
+        <% } else { %><span class="tag">Live</span> <span class="muted small"><%= formatShortDate(r.published_at) %></span><% } %>
+      </td>
+      <td data-label="Promoted">
+        <% if (r.status === 'published' && !r.scheduled) { %>
+        <form method="post" action="/admin/reviews/<%= r.id %>/promote">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="back" value="<%= currentUrl %>">
+          <input type="hidden" name="promoted" value="<%= r.promoted ? '' : 'on' %>">
+          <button class="btn-mini<%= r.promoted ? ' is-on' : '' %>" type="submit"><%- icon('pin', { size: 15 }) %> <%= r.promoted ? 'Promoted' : 'Promote' %><% if (r.promoted) { %><span class="visually-hidden">: remove promotion from <%= r.title %></span><% } else { %><span class="visually-hidden"> <%= r.title %></span><% } %></button>
+        </form>
+        <% } else { %><span class="muted small">Publish first</span><% } %>
+      </td>
+      <td class="cell-actions">
+        <a href="/admin/reviews/<%= r.id %>/edit">Edit</a>
+        <% if (r.status === 'published' && !r.scheduled) { %><a href="/reviews/<%= r.slug %>" target="_blank" rel="noopener">View</a><% } %>
+        <a href="/admin/reviews/<%= r.id %>/delete">Delete</a>
+      </td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>

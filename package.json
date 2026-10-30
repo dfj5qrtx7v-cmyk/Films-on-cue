@@ -1,0 +1,33 @@
+{
+  "name": "films-on-cue",
+  "version": "1.0.0",
+  "description": "Films on Cue: weekly film reviews, with an owner-only dashboard.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "digest": "node scripts/send-digest.js",
+    "art": "node scripts/generate-art.cjs",
+    "local": "node --env-file=.env --watch src/server.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.2",
+    "connect-pg-simple": "^10.0.0",
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.2",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "multer": "^2.5.0",
+    "openid-client": "^6.8.8",
+    "passport": "^0.7.0",
+    "pg": "^8.23.1",
+    "sanitize-html": "^2.18.1",
+    "sharp": "^0.35.5",
+    "trix": "^2.1.19"
+  }
+}

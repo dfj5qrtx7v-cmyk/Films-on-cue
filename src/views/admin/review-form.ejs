@@ -1,0 +1,181 @@
+<%- include('_top', { editor: true }) %>
+<%
+  const r = review;
+  const isNew = !r.id;
+  const live = r.status === 'published';
+  const scheduled = live && r.published_at && new Date(r.published_at) > new Date();
+  const err = (k) => errors[k] ? `aria-invalid="true" aria-describedby="${k}-error"` : '';
+  const errText = (k) => errors[k] ? `<p class="form-note form-note-error" id="${k}-error">${escapeHtml(errors[k])}</p>` : '';
+  const val = (v) => v == null ? '' : v;
+%>
+<div class="admin-head">
+  <h1><%= isNew ? 'New review' : 'Edit review' %></h1>
+  <% if (!isNew && live && !scheduled) { %><a class="btn btn-line" href="/reviews/<%= r.slug %>" target="_blank" rel="noopener"><%- icon('eye', { size: 18 }) %> View on site</a><% } %>
+</div>
+
+<% if (Object.keys(errors).length) { %>
+<div class="error-summary" role="alert" tabindex="-1">
+  <p><strong>The review wasn’t saved. Fix these and try again:</strong></p>
+  <ul><% for (const [k, v] of Object.entries(errors)) { %><li><a href="#<%= k === 'body_html' ? 'body_editor' : k %>"><%= v %></a></li><% } %></ul>
+</div>
+<% } %>
+
+<form class="review-form" method="post" action="<%= isNew ? '/admin/reviews' : `/admin/reviews/${r.id}` %>" enctype="multipart/form-data" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+
+  <div class="review-form-main">
+    <div class="field">
+      <label for="title">Film title</label>
+      <input id="title" name="title" class="input-title" value="<%= val(r.title) %>" required <%- err('title') %>>
+      <%- errText('title') %>
+    </div>
+
+    <div class="field">
+      <span class="field-label" id="body-label">Review</span>
+      <input id="body_html" type="hidden" name="body_html" value="<%= val(r.body_html) %>">
+      <trix-editor id="body_editor" input="body_html" class="prose editor" aria-labelledby="body-label"<%- errors.body_html ? ' aria-invalid="true"' : '' %>></trix-editor>
+      <%- errText('body_html') %>
+    </div>
+
+    <div class="field">
+      <label for="excerpt">Short summary</label>
+      <p class="hint" id="excerpt-hint">Shown on review cards and in the newsletter. Leave it blank to use the start of the review.</p>
+      <textarea id="excerpt" name="excerpt" rows="3" maxlength="320" aria-describedby="excerpt-hint" data-count="220"><%= val(r.excerpt) %></textarea>
+    </div>
+
+    <fieldset class="admin-fieldset">
+      <legend>Film details</legend>
+      <div class="field-grid">
+        <div class="field">
+          <label for="release_year">Release year</label>
+          <input id="release_year" name="release_year" inputmode="numeric" maxlength="4" value="<%= val(r.release_year) %>" <%- err('release_year') %>>
+          <%- errText('release_year') %>
+        </div>
+        <div class="field">
+          <label for="director">Director</label>
+          <input id="director" name="director" value="<%= val(r.director) %>">
+        </div>
+        <div class="field">
+          <label for="certificate">Certificate</label>
+          <select id="certificate" name="certificate">
+            <option value="">Not set</option>
+            <% for (const c of CERTIFICATES) { %><option<%- r.certificate === c ? ' selected' : '' %>><%= c %></option><% } %>
+          </select>
+        </div>
+        <div class="field">
+          <label for="runtime_minutes">Running time (minutes)</label>
+          <input id="runtime_minutes" name="runtime_minutes" inputmode="numeric" maxlength="3" value="<%= val(r.runtime_minutes) %>" <%- err('runtime_minutes') %>>
+          <%- errText('runtime_minutes') %>
+        </div>
+      </div>
+      <fieldset class="genres">
+        <legend class="field-label">Genres</legend>
+        <div class="check-grid">
+          <% for (const g of GENRES) { %>
+          <label class="check-inline"><input type="checkbox" name="genres" value="<%= g %>"<%- (r.genres || []).includes(g) ? ' checked' : '' %>> <%= g %></label>
+          <% } %>
+        </div>
+      </fieldset>
+      <div class="field-grid">
+        <div class="field">
+          <label for="watch_where">Where to watch</label>
+          <select id="watch_where" name="watch_where">
+            <option value="">Not set</option>
+            <% for (const [k, label] of Object.entries(WATCH_OPTIONS)) { %><option value="<%= k %>"<%- r.watch_where === k ? ' selected' : '' %>><%= label %></option><% } %>
+          </select>
+        </div>
+        <div class="field">
+          <label for="watch_detail">Cinema chain or service</label>
+          <input id="watch_detail" name="watch_detail" value="<%= val(r.watch_detail) %>" placeholder="For example, Netflix or Curzon">
+        </div>
+      </div>
+      <div class="field">
+        <label for="trailer_url">Trailer link</label>
+        <input id="trailer_url" name="trailer_url" type="url" value="<%= val(r.trailer_url) %>" placeholder="https://www.youtube.com/watch?v=…" <%- err('trailer_url') %>>
+        <%- errText('trailer_url') %>
+      </div>
+      <label class="check">
+        <input type="checkbox" name="has_spoilers"<%- r.has_spoilers ? ' checked' : '' %>>
+        <span>Show a spoiler warning at the top of the review</span>
+      </label>
+    </fieldset>
+
+    <details class="admin-details"<%- errors.slug ? ' open' : '' %>>
+      <summary>Web address</summary>
+      <div class="field">
+        <label for="slug">Address of this review</label>
+        <p class="hint" id="slug-hint">The end of the review’s link: <%= siteUrl %>/reviews/<strong data-slug-preview><%= r.slug || 'film-title' %></strong>. Changing it breaks links people have already shared.</p>
+        <input id="slug" name="slug" value="<%= val(r.slug) %>" aria-describedby="slug-hint" placeholder="Made from the title">
+      </div>
+    </details>
+  </div>
+
+  <div class="review-form-side">
+    <section class="admin-box side-box" aria-labelledby="publish-heading">
+      <h2 id="publish-heading">Publish</h2>
+      <p class="status-line">
+        <% if (isNew) { %>Not saved yet
+        <% } else if (!live) { %><span class="tag tag-line">Draft</span>
+        <% } else if (scheduled) { %><span class="tag tag-line">Scheduled</span> for <%= formatDateTime(r.published_at) %>
+        <% } else { %><span class="tag">Live</span> since <%= formatDateTime(r.published_at) %><% } %>
+      </p>
+      <div class="field">
+        <label for="published_at">Publish date and time (UK)</label>
+        <p class="hint" id="pub-hint">Leave blank to publish straight away. Choose a future time to schedule it.</p>
+        <input id="published_at" name="published_at" type="datetime-local" value="<%= publishAtInput %>" aria-describedby="pub-hint" <%- err('published_at') %>>
+        <%- errText('published_at') %>
+      </div>
+      <div class="button-stack">
+        <button class="btn btn-ink btn-block" type="submit" name="intent" value="publish"><%= live ? 'Save changes' : 'Publish' %></button>
+        <button class="btn btn-line btn-block" type="submit" name="intent" value="draft"><%= live ? 'Unpublish (save as draft)' : 'Save draft' %></button>
+      </div>
+    </section>
+
+    <section class="admin-box side-box" aria-labelledby="rating-heading">
+      <h2 id="rating-heading"><label for="rating">Star rating</label></h2>
+      <select id="rating" name="rating" required <%- err('rating') %>>
+        <option value="">Choose a rating</option>
+        <% for (const n of RATINGS.slice().reverse()) { %><option value="<%= n %>"<%- Number(r.rating) === n ? ' selected' : '' %>><%= starsText(n) %>  <%= formatRating(n) %> out of 5</option><% } %>
+      </select>
+      <%- errText('rating') %>
+    </section>
+
+    <section class="admin-box side-box" aria-labelledby="image-heading">
+      <h2 id="image-heading">Image</h2>
+      <div class="image-preview" data-image-preview>
+        <% if (r.image_id) { %><img src="<%= img(r.image_id, 'sm') %>" alt=""><% } else { %><p class="muted small">No image yet.</p><% } %>
+      </div>
+      <div class="field">
+        <label for="image"><%= r.image_id ? 'Replace image' : 'Upload an image' %></label>
+        <p class="hint" id="image-hint">A landscape still works best (3:2 or 16:9). JPEG, PNG or WebP, up to 12 MB.</p>
+        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif" aria-describedby="image-hint" <%- err('image') %>>
+        <%- errText('image') %>
+      </div>
+      <% if (r.image_id) { %>
+      <label class="check"><input type="checkbox" name="remove_image"> <span>Remove this image</span></label>
+      <% } %>
+      <div class="field">
+        <label for="image_alt">Image description</label>
+        <p class="hint" id="alt-hint">For people using screen readers, for example “Two sisters on a pier at dusk”.</p>
+        <input id="image_alt" name="image_alt" value="<%= val(r.image_alt) %>" aria-describedby="alt-hint">
+      </div>
+      <div class="field">
+        <label for="image_credit">Image credit</label>
+        <input id="image_credit" name="image_credit" value="<%= val(r.image_credit) %>" placeholder="For example, Image: Altitude Films">
+      </div>
+    </section>
+
+    <section class="admin-box side-box" aria-labelledby="promote-heading">
+      <h2 id="promote-heading">Promote</h2>
+      <label class="check">
+        <input id="promoted" type="checkbox" name="promoted"<%- r.promoted ? ' checked' : '' %> <%- err('promoted') %>>
+        <span>Promote to the top of the site</span>
+      </label>
+      <p class="hint">Shows first on the home and reviews pages. Replaces any review promoted now.</p>
+      <%- errText('promoted') %>
+    </section>
+
+    <% if (!isNew) { %><p class="delete-link"><a href="/admin/reviews/<%= r.id %>/delete"><%- icon('trash', { size: 16 }) %> Delete this review</a></p><% } %>
+  </div>
+</form>
+<%- include('_bottom') %>

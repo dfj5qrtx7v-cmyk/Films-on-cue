@@ -1,0 +1,42 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <h1>Overview</h1>
+  <a class="btn btn-ink" href="/admin/reviews/new"><%- icon('plus', { size: 18 }) %> Write a review</a>
+</div>
+
+<% if (setup.length) { %>
+<section class="admin-box admin-setup" aria-labelledby="setup-heading">
+  <h2 id="setup-heading">Finish setting up</h2>
+  <ul>
+    <% for (const item of setup) { %><li><%= item.text %><% if (item.href) { %> <a href="<%= item.href %>">Go there</a><% } %></li><% } %>
+  </ul>
+</section>
+<% } %>
+
+<ul class="stat-row">
+  <li><a href="/admin/reviews?status=published"><span class="stat-num"><%= counts.published %></span> live <%= counts.published === 1 ? 'review' : 'reviews' %></a></li>
+  <li><a href="/admin/reviews?status=scheduled"><span class="stat-num"><%= counts.scheduled %></span> scheduled</a></li>
+  <li><a href="/admin/reviews?status=draft"><span class="stat-num"><%= counts.draft %></span> <%= counts.draft === 1 ? 'draft' : 'drafts' %></a></li>
+  <li><a href="/admin/newsletter"><span class="stat-num"><%= subs.active %></span> <%= subs.active === 1 ? 'subscriber' : 'subscribers' %></a></li>
+  <li><a href="/admin/messages"><span class="stat-num"><%= unread %></span> unread <%= unread === 1 ? 'message' : 'messages' %></a></li>
+</ul>
+
+<section class="admin-box" aria-labelledby="next-heading">
+  <h2 id="next-heading">Next newsletter</h2>
+  <% if (!settings.newsletter.autoSend) { %>
+    <p>Automatic sending is off. You can send it yourself from the <a href="/admin/newsletter">newsletter page</a>.</p>
+  <% } else { %>
+    <p>Goes out on <strong><%= DAY_NAMES[settings.newsletter.day] %> at <%= hourLabel(settings.newsletter.hour) %></strong> (UK time)
+    with <strong><%= pending.reviews.length %> new <%= pending.reviews.length === 1 ? 'review' : 'reviews' %></strong><%= pending.reviews.length ? '' : ', so it will be skipped unless you publish something first' %>.</p>
+  <% } %>
+</section>
+
+<section aria-labelledby="recent-heading">
+  <div class="admin-subhead"><h2 id="recent-heading">Recent reviews</h2><a href="/admin/reviews">All reviews</a></div>
+  <% if (recent.length) { %>
+    <%- include('_review-table', { rows: recent }) %>
+  <% } else { %>
+    <div class="admin-empty"><p>No reviews yet. <a href="/admin/reviews/new">Write your first review</a>.</p></div>
+  <% } %>
+</section>
+<%- include('_bottom') %>

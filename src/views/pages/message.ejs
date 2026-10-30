@@ -1,0 +1,14 @@
+<%- include('../partials/head', { noindex: true }) %>
+<%- include('../partials/header') %>
+<main id="main">
+  <section class="message-page<%= locals.art ? ' message-art' : '' %>">
+    <div class="wrap">
+      <div class="panel panel-paper message-panel">
+        <h1 class="display"><%= heading %></h1>
+        <p><%= text %></p>
+        <% if (locals.link) { %><p><a class="btn btn-ink" href="<%= link.href %>"><%= link.label %></a></p><% } %>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

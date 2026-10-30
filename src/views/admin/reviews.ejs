@@ -1,0 +1,17 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <h1>Reviews</h1>
+  <a class="btn btn-ink" href="/admin/reviews/new"><%- icon('plus', { size: 18 }) %> Write a review</a>
+</div>
+<nav class="tabs" aria-label="Filter by status">
+  <% for (const [key, label, n] of [['all', 'All', counts.total], ['published', 'Live', counts.published], ['scheduled', 'Scheduled', counts.scheduled], ['draft', 'Drafts', counts.draft]]) { %>
+  <a href="/admin/reviews<%= key === 'all' ? '' : '?status=' + key %>"<%- status === key ? ' aria-current="page"' : '' %>><%= label %> <span class="tab-count"><%= n %></span></a>
+  <% } %>
+</nav>
+<% if (rows.length) { %>
+  <%- include('_review-table', { rows }) %>
+  <p class="muted small admin-hint">Only one review can be promoted at a time. It shows first on the home page and the reviews page, and in the home page hero.</p>
+<% } else { %>
+  <div class="admin-empty"><p><%= status === 'all' ? 'No reviews yet.' : 'Nothing here.' %> <a href="/admin/reviews/new">Write a review</a>.</p></div>
+<% } %>
+<%- include('_bottom') %>

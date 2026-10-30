@@ -1,0 +1,15 @@
+modules = ["nodejs-22", "postgresql-16"]
+run = "npm run dev"
+entrypoint = "src/server.js"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["npm", "ci"]
+run = ["node", "src/server.js"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80

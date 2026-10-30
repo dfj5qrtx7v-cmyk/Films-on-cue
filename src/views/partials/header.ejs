@@ -1,0 +1,22 @@
+<body class="<%= locals.bodyClass || '' %>">
+<a class="skip-link" href="#main">Skip to content</a>
+<% if (socials.length) { %>
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <%- include('socials', { label: 'Follow us' }) %>
+  </div>
+</div>
+<% } %>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="wordmark" href="/"><%= settings.site.name %><span class="cue-mark" aria-hidden="true"></span></a>
+    <nav class="main-nav" aria-label="Main">
+      <ul>
+        <% for (const [href, label] of [['/reviews', 'Reviews'], ['/about', 'About'], ['/contact', 'Contact']]) { %>
+        <li><a href="<%= href %>"<%- currentPath === href || currentPath.startsWith(href + '/') ? ' aria-current="page"' : '' %>><%= label %></a></li>
+        <% } %>
+        <% if (ownerSignedIn) { %><li><a class="nav-owner" href="/admin">Dashboard</a></li><% } %>
+      </ul>
+    </nav>
+  </div>
+</header>

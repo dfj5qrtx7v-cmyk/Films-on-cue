@@ -1,0 +1,18 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main">
+  <section class="hero hero-about">
+    <div class="wrap hero-grid hero-grid-single">
+      <div class="panel panel-ink hero-copy">
+        <h1 class="display"><%= settings.about.heading %></h1>
+        <% if (settings.about.intro) { %><p class="lede"><%= settings.about.intro %></p><% } %>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <div class="prose prose-page"><%- settings.about.bodyHtml %></div>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

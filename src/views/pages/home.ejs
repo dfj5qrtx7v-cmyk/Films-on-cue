@@ -1,0 +1,46 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main">
+  <section class="hero hero-home">
+    <div class="wrap hero-grid">
+      <div class="panel panel-ink hero-copy">
+        <h1 class="display"><%= settings.home.heading %></h1>
+        <% if (settings.home.intro) { %><p class="lede"><%= settings.home.intro %></p><% } %>
+        <p><a class="btn btn-paper" href="/reviews">Browse all reviews</a></p>
+        <% if (featured) { %>
+        <a class="hero-featured" href="/reviews/<%= featured.slug %>">
+          <img src="<%= img(featured.image_id, 'sm') %>" alt="" width="120" height="80">
+          <span>
+            <span class="hero-featured-label">Featured review</span>
+            <span class="hero-featured-title"><%= featured.title %></span>
+            <%- starsHtml(featured.rating, { size: 14 }) %>
+          </span>
+        </a>
+        <% } %>
+      </div>
+      <aside class="panel panel-paper hero-signup" id="newsletter" aria-labelledby="nl-heading">
+        <%- include('../partials/newsletter-form', { back: '/', formId: 'nl' }) %>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="latest-heading">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="latest-heading">Latest reviews</h2>
+        <% if (latest.length) { %><a class="text-link" href="/reviews">See all reviews</a><% } %>
+      </div>
+      <% if (latest.length) { %>
+      <div class="grid-3">
+        <% latest.forEach((r, i) => { %><%- include('../partials/review-card', { r, eager: i === 0, showFeatured: true }) %><% }) %>
+      </div>
+      <% } else { %>
+      <div class="empty">
+        <p class="empty-title">The first reviews are on their way.</p>
+        <p>Subscribe above and you’ll get them as soon as they’re published.</p>
+      </div>
+      <% } %>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

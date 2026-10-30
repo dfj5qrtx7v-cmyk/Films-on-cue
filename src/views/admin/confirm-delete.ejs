@@ -1,0 +1,11 @@
+<%- include('_top') %>
+<div class="admin-head"><h1>Delete this review?</h1></div>
+<div class="admin-box admin-narrow">
+  <p><strong><%= review.title %></strong> will be removed from the site and can’t be recovered. Links to it will stop working.</p>
+  <form method="post" action="/admin/reviews/<%= review.id %>/delete" class="button-row">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <button class="btn btn-ink" type="submit"><%- icon('trash', { size: 18 }) %> Delete review</button>
+    <a class="btn btn-line" href="/admin/reviews/<%= review.id %>/edit">Keep it</a>
+  </form>
+</div>
+<%- include('_bottom') %>

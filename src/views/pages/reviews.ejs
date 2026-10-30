@@ -1,0 +1,99 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main">
+  <section class="hero hero-band hero-reviews">
+    <div class="wrap">
+      <div class="panel panel-ink band-title">
+        <h1 class="display">Reviews</h1>
+        <p class="lede">Every review, newest first.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="wrap">
+      <form class="filters" method="get" action="/reviews" role="search" aria-label="Filter reviews">
+        <details class="filters-details" open<%- result.filtered ? ' data-keep-open' : '' %>>
+        <summary class="filters-toggle">Filter and sort<%= result.filtered ? ' (on)' : '' %></summary>
+        <div class="filters-body">
+        <div class="field field-search">
+          <label for="f-q">Search</label>
+          <div class="input-icon"><%- icon('search', { size: 18 }) %><input id="f-q" name="q" type="search" placeholder="Film or director" value="<%= filters.q || '' %>"></div>
+        </div>
+        <div class="field">
+          <label for="f-genre">Genre</label>
+          <select id="f-genre" name="genre">
+            <option value="">All genres</option>
+            <% for (const g of options.genres) { %><option<%- filters.genre === g ? ' selected' : '' %>><%= g %></option><% } %>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-rating">Rating</label>
+          <select id="f-rating" name="rating">
+            <option value="">Any rating</option>
+            <% for (const n of [5, 4, 3, 2]) { %><option value="<%= n %>"<%- filters.rating === n ? ' selected' : '' %>><%= n === 5 ? '5 stars only' : `${n} stars and up` %></option><% } %>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-year">Release year</label>
+          <select id="f-year" name="year">
+            <option value="">Any year</option>
+            <% for (const y of options.years) { %><option<%- filters.year === y ? ' selected' : '' %>><%= y %></option><% } %>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-watch">Where to watch</label>
+          <select id="f-watch" name="watch">
+            <option value="">Anywhere</option>
+            <option value="cinema"<%- filters.watch === 'cinema' ? ' selected' : '' %>>In cinemas</option>
+            <option value="streaming"<%- filters.watch === 'streaming' ? ' selected' : '' %>>Streaming</option>
+            <option value="rent"<%- filters.watch === 'rent' ? ' selected' : '' %>>To rent or buy</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-sort">Sort by</label>
+          <select id="f-sort" name="sort">
+            <option value="">Newest first</option>
+            <option value="rating"<%- filters.sort === 'rating' ? ' selected' : '' %>>Highest rated</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button class="btn btn-ink" type="submit">Show reviews</button>
+          <% if (result.filtered) { %><a class="text-link" href="/reviews">Clear filters</a><% } %>
+        </div>
+        </div>
+        </details>
+      </form>
+
+      <p class="results-count" role="status">
+        <% if (result.total) { %><%= result.total %> <%= result.total === 1 ? 'review' : 'reviews' %><%= result.filtered ? ' match' + (result.total === 1 ? 'es' : '') + ' your filters' : '' %><% if (result.pages > 1) { %>, page <%= filters.page %> of <%= result.pages %><% } %><% } %>
+      </p>
+
+      <% if (result.rows.length) { %>
+        <% const leadFirst = !result.filtered && filters.page === 1 && result.rows[0].promoted; %>
+        <div class="grid-3">
+          <% result.rows.forEach((r, i) => { %><%- include('../partials/review-card', { r, lead: leadFirst && i === 0, eager: i < 3, showFeatured: !result.filtered }) %><% }) %>
+        </div>
+      <% } else if (result.filtered) { %>
+        <div class="empty">
+          <p class="empty-title">No reviews match those filters.</p>
+          <p>Try fewer filters, or <a href="/reviews">see every review</a>.</p>
+        </div>
+      <% } else { %>
+        <div class="empty">
+          <p class="empty-title">The first reviews are on their way.</p>
+          <p><a href="/#newsletter">Subscribe</a> and you’ll get them as soon as they’re published.</p>
+        </div>
+      <% } %>
+
+      <% if (result.pages > 1) { %>
+      <nav class="pager" aria-label="Pages">
+        <% if (filters.page > 1) { %><a class="btn btn-line" href="<%= pageUrl(filters.page - 1) %>" rel="prev">Newer reviews</a><% } else { %><span></span><% } %>
+        <span class="pager-count">Page <%= filters.page %> of <%= result.pages %></span>
+        <% if (filters.page < result.pages) { %><a class="btn btn-line" href="<%= pageUrl(filters.page + 1) %>" rel="next">Older reviews</a><% } else { %><span></span><% } %>
+      </nav>
+      <% } %>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

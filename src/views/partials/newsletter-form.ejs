@@ -1,0 +1,33 @@
+<%
+  const status = locals.newsletterStatus;
+  const day = DAY_NAMES[settings.newsletter.day];
+  const notes = {
+    subscribed: { ok: true, text: `You’re subscribed. Your first email arrives on ${day}.` },
+    'check-email': { ok: true, text: 'Check your inbox and click the link in our email to confirm.' },
+    invalid: { ok: false, text: 'Enter an email address like name@example.com.' },
+    consent: { ok: false, text: 'Tick the box to agree to receive the weekly email.' },
+  };
+  const note = notes[status];
+  const id = locals.formId || 'nl';
+%>
+<h2 class="signup-heading" id="<%= id %>-heading"><%= settings.home.newsletterHeading %></h2>
+<p class="signup-text"><%= settings.home.newsletterText %></p>
+<% if (note && note.ok) { %>
+  <p class="form-note form-note-ok" role="status"><%- icon('check', { size: 18 }) %> <%= note.text %></p>
+<% } else { %>
+<form class="signup-form" method="post" action="/newsletter" novalidate>
+  <input type="hidden" name="back" value="<%= locals.back || '/' %>">
+  <%- include('spam-fields') %>
+  <div class="field">
+    <label for="<%= id %>-email">Email address</label>
+    <input id="<%= id %>-email" name="email" type="email" autocomplete="email" inputmode="email" required spellcheck="false"
+      <%- note && status === 'invalid' ? `aria-invalid="true" aria-describedby="${id}-error"` : '' %>>
+  </div>
+  <div class="check">
+    <input id="<%= id %>-consent" name="consent" type="checkbox" value="yes" required <%- status === 'consent' ? `aria-invalid="true" aria-describedby="${id}-error"` : '' %>>
+    <label for="<%= id %>-consent">Send me the weekly <%= settings.site.name %> email. I can unsubscribe at any time (<a href="/privacy">privacy policy</a>).</label>
+  </div>
+  <% if (note) { %><p class="form-note form-note-error" id="<%= id %>-error" role="alert"><%= note.text %></p><% } %>
+  <button class="btn btn-ink btn-block" type="submit">Subscribe</button>
+</form>
+<% } %>
